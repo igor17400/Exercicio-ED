@@ -162,6 +162,7 @@ int main(){
     char *nome_topo_print = alocarChar(20);
     char *nome_final_print = alocarChar(20);
     int numero = 0;
+    int i;
 
     //cria fila
     fila q_fila;
@@ -181,7 +182,6 @@ int main(){
         nomes = strtok(NULL, " ");
     }
 
-    int i;
     for(i = 0; i < numero; i++){
         lerTopoFila(&q_fila, nome_topo);
         dequeue(&q_fila);
@@ -194,6 +194,10 @@ int main(){
     printf("Pessoa da frente: %s\n", nome_topo_print);
     printf("Pessoa do fim: %s\n", nome_final_print);
 
+    for(i = 0; i < numero; i++){
+
+        dequeue(&q_fila);
+    }
     liberaChar(&nome_topo);
 	liberaChar(&pStr);
     liberaChar(&nome_topo_print);
