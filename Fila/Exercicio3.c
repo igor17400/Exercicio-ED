@@ -11,7 +11,6 @@ typedef struct elem {
     int pos_priority;
     char nome[20];
     struct elem *next;
-    struct elem *prev;
 } tipo_elem;
 
 typedef struct{
@@ -49,7 +48,7 @@ void printReverse(tipo_elem* head)
 void imprime(fila *q) {
     //usando um ponteiro auxiliar
     tipo_elem *x;
-    x = q->fim;
+    x = q->inicio;
 
     //iterando na pilha
     while(x != NULL) {
@@ -59,42 +58,46 @@ void imprime(fila *q) {
     printf("\n");
 }
 
-// insere x no fim de q
-boolean enqueuePrioriry(fila *q_fila, char *nome, int priority) {
-    tipo_elem *temp = q_fila->fim;
-    tipo_elem *temp_prev = temp;
+
+// Function to push according to priority
+void enqueuePriority(tipo_elem** head, char *nome, int p){
+    tipo_elem* start = (*head);
+
+    tipo_elem* temp = malloc(sizeof(tipo_elem));
+
+    strcpy(temp->nome, nome);
+    temp->pos_priority = p;
+
+    if ((*head)->pos_priority > p) {
+        temp->next = *head;
+        (*head) = temp;
+    } else {
+        while (start->next != NULL &&
+               start->next->pos_priority < p) {
+            start = start->next;
+        }
+        temp->next = start->next;
+        start->next = temp;
+    }
+}
+
+boolean enqueue(fila *q_fila, char *nome, int p) {
+
     tipo_elem *novo_elemento = malloc(sizeof(tipo_elem));
     if(novo_elemento == NULL)
         return FALSE;
 
     strcpy(novo_elemento->nome, nome);
-    novo_elemento->pos_priority = priority;
+    novo_elemento->pos_priority = p;
     novo_elemento->next = NULL;
 
     if(isEmpty(q_fila)) {
-        // lista vazia inserimos no começo
-        q_fila->inicio = novo_elemento;
-        q_fila->fim = novo_elemento;
-    } else if(q_fila->inicio->pos_priority > priority){
-        // se o primeiro elemento tem uma prioridade maior basta inserir atrás dele
-        q_fila->inicio->next = novo_elemento;
         q_fila->inicio = novo_elemento;
     } else {
-        // rodar a lista para procurar onde inserir o elemento
-        while (temp->next != NULL
-            && temp->pos_priority > priority) {
-            temp_prev = temp;
-            temp = temp->next;
-        }
-
-        novo_elemento->next = temp;
-        if(temp == temp_prev){
-            q_fila->fim = novo_elemento;
-        } else if(temp != temp_prev){
-            temp_prev->next = novo_elemento;
-        }
+        q_fila->fim->next = novo_elemento;
     }
 
+    q_fila->fim = novo_elemento;
     return TRUE;
 }
 
@@ -122,16 +125,13 @@ boolean dequeue(fila *q_fila) {
     }
 
     p_elem = q_fila->inicio;
-    q_fila->inicio = p_elem->prev;
+    q_fila->inicio = p_elem->next;
 
     if(q_fila->inicio == NULL) {
         q_fila->fim = NULL;
-    } else {
-        q_fila->inicio->next = NULL;
     }
 
     free(p_elem);
-    p_elem = NULL;
     return TRUE;
 }
 
@@ -202,18 +202,6 @@ int isNumeric (const char * s){
     return *p == '\0';
 }
 
-// insere x no fim de q
-void colocaPrev(fila *q_fila) {
-    tipo_elem *temp = q_fila->fim;
-    tipo_elem *temp_prev = q_fila->fim;
-    temp->prev = NULL;
-    while(temp->next != NULL){
-        temp_prev = temp;
-        temp = temp->next;
-        temp->prev = temp_prev;
-    }
-}
-
 int main(){
 
     unsigned int len_max = 250;
@@ -224,6 +212,7 @@ int main(){
     int numero = 0;
     int i;
     int qtd = 0;
+    int flag = 0;
 
     //cria fila
     fila q_fila;
@@ -247,13 +236,16 @@ int main(){
                 pStr_palavra = palavras;
                 qtd++;
             } else {
-                // printf("--> %s %d\n", pStr_palavra, atoi(palavras));
-                enqueuePrioriry(&q_fila, pStr_palavra, atoi(palavras));
+                if(flag == 0){
+                    enqueue(&q_fila, pStr_palavra, atoi(palavras));
+                    flag++;
+                }else{
+                    enqueuePriority(&(q_fila.inicio), pStr_palavra, atoi(palavras));
+                }
             }
             palavras = strtok(NULL, " ");
         }
     }
-    colocaPrev(&q_fila);
 
     for(i = 0; i < numero; i++){
         dequeue(&q_fila);
@@ -261,7 +253,7 @@ int main(){
     }
 
     printf("Tamanho da fila: %d\n", qtd);
-    printReverse(q_fila.fim);
+    imprime(&q_fila);
 
     while(1){
         if(dequeue(&q_fila) == FALSE)
