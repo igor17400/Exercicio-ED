@@ -198,8 +198,8 @@ int main(){
 
         dequeue(&q_fila);
     }
-    liberaChar(&nome_topo);
 	liberaChar(&pStr);
+    liberaChar(&nome_topo);
     liberaChar(&nome_topo_print);
     liberaChar(&nome_final_print);
     return 0;
