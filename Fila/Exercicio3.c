@@ -263,7 +263,11 @@ int main(){
     printf("Tamanho da fila: %d\n", qtd);
     printReverse(q_fila.fim);
 
-    while(dequeue(&q_fila));
+    while(1){
+        if(dequeue(&q_fila) == FALSE)
+            break;
+        dequeue(&q_fila);
+    }
 	liberaChar(&pStr);
     return 0;
 
