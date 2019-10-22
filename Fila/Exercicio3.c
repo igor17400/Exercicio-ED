@@ -58,7 +58,6 @@ void imprime(fila *q) {
     printf("\n");
 }
 
-
 // Function to push according to priority
 void enqueuePriority(tipo_elem** head, char *nome, int p){
     tipo_elem* start = (*head);
