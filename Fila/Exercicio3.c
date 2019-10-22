@@ -49,6 +49,8 @@ void enqueuePriority(tipo_elem** head, char *nome, int p){
     tipo_elem* temp = malloc(sizeof(tipo_elem));
 
     strcpy(temp->nome, nome);
+    if(p < 1 || p > 10)
+        exit(0);
     temp->pos_priority = p;
 
     if ((*head)->pos_priority > p) {
@@ -71,6 +73,8 @@ boolean enqueue(fila *q_fila, char *nome, int p) {
         return FALSE;
 
     strcpy(novo_elemento->nome, nome);
+    if(p < 1 || p > 10)
+        exit(0);
     novo_elemento->pos_priority = p;
     novo_elemento->next = NULL;
 
@@ -210,6 +214,8 @@ int main(){
 
         if (isNumeric(palavras)){
             numero = atoi(palavras);
+            if(numero < 0)
+                exit(0);
             break;
         }
 
