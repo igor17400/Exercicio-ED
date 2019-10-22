@@ -158,9 +158,9 @@ int containPalindrome(char *string){
     int n = strlen(string);
     int flag = 0;
     int i, j, k = 0;
-    char *juncao = malloc(100*sizeof(char));
-    char *teste = malloc(40*sizeof(char));
-    strncat(juncao, "00", 2);
+    char juncao[100] = "";
+    char teste[40] = "";// = malloc(40*sizeof(char));
+    strncat(juncao, "00", 3);
     for(i = 0; i < n; i++){
         for(j = i; j < n; j++){
             for(k = i; k <= j; k++){
@@ -184,8 +184,8 @@ int containPalindrome(char *string){
     }
     strcpy(teste, "");
     strcpy(juncao, "");
-    free(teste);
-    free(juncao);
+    //free(teste);
+    //free(juncao);
     if(flag >= 2){
         return 1;
     } else {
