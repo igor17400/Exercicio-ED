@@ -40,7 +40,6 @@ void imprime(fila *q) {
         printf("Atividade: %s Prioridade: #%d\n", x->nome, x->pos_priority);
         x = x->next;
     }
-    printf("\n");
 }
 
 /* Function to push according to priority */
@@ -93,7 +92,8 @@ void printPos(fila *q_fila, int pos) {
     temp = q_fila->inicio;
 
     /* iterando na pilha */
-    for(int i = 0; i < pos && temp->next != NULL; i++) {
+    int i = 0;
+    for(i = 0; i < pos && temp->next != NULL; i++) {
         temp = temp->next;
     }
 
