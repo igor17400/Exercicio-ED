@@ -18,32 +18,26 @@ typedef struct{
     tipo_elem *fim;
 } fila;
 
-// cria fila vazia com dois ponteiros
 void create(fila *q) {
     q->inicio = NULL;
     q->fim = NULL;
 }
 
-// testa se q está vazia
 boolean isEmpty (fila *q) {
     return (q->inicio == NULL);
 }
 
-// imprime q
 void imprime(fila *q) {
 
-    //usando um ponteiro auxiliar
     tipo_elem *x;
     x = q->inicio;
 
-    //iterando na pilha
     while(x != NULL) {
         printf("%s\n", x->nome);
         x = x->ligado_com;
     }
 }
 
-// insere x no fim de q
 boolean enqueue(fila *q_fila, char *nome) {
 
     tipo_elem *novo_elemento = malloc(sizeof(tipo_elem));
@@ -63,7 +57,6 @@ boolean enqueue(fila *q_fila, char *nome) {
     return TRUE;
 }
 
-// remove do topo de q
 boolean dequeue(fila *q_fila) {
 
     tipo_elem *p_elem;
@@ -120,7 +113,6 @@ void liberaChar(char** lib_char){
 char* entraStringGrande(char* pStr, int len_max){
     unsigned int current_size = 0;
 
-    /*Espera o usuario entrar com a string que vamos analisar*/
     if(pStr != NULL){
     	int c = EOF;
     	unsigned int i =0;
@@ -129,7 +121,6 @@ char* entraStringGrande(char* pStr, int len_max){
     	{
     		pStr[i++]=(char)c;
 
-            /* caso tenhamos chegado no máximo precisamos utilizar o realloc*/
     		if(i == current_size){
                 current_size = i+len_max;
     			pStr = realloc(pStr, current_size);
@@ -166,41 +157,31 @@ int isPalindrome(char str[]){
 int containPalindrome(char *string){
     int n = strlen(string);
     int flag = 0;
+    int i, j, k = 0;
     char *juncao = malloc(100*sizeof(char));
     char *teste = malloc(40*sizeof(char));
     strncat(juncao, "00", 2);
-    for(int i = 0; i < n; i++){
-        for(int j = i; j < n; j++){
-            for(int k = i; k <= j; k++){
+    for(i = 0; i < n; i++){
+        for(j = i; j < n; j++){
+            for(k = i; k <= j; k++){
                 strncat(teste, &string[k], 1);
             }
             if(isPalindrome(teste) && (strlen(teste) > 2) ){
-                // printf("-->* %s\n", teste);
-                // printf("--> %s\n", juncao);
-                // printf("--> %s\n", strstr(juncao, teste));
-                // printf("--> juncao = %lu\n", strlen(juncao));
-                // printf("--> teste = %lu\n", strlen(teste));
                 if(strlen(juncao) > strlen(teste)){
-                    // printf("1\n");
                     if( strstr(juncao, teste) == NULL ){
-                        // printf("**** 1\n");
                         flag++;
                     }
                 } else if(strlen(juncao) <= strlen(teste)){
-                    // printf("2\n");
                     if( strstr(teste, juncao) == NULL ){
-                        // printf("**** 2\n");
                         flag++;
                     }
                 }
-                // printf("\n");
                 strncat(juncao, teste, strlen(teste));
                 strncat(juncao, "0", 1);
             }
             strcpy(teste, "");
         }
     }
-    // printf("--> flag = %d\n", flag);
     strcpy(teste, "");
     strcpy(juncao, "");
     free(teste);
@@ -219,23 +200,22 @@ int main(){
     char *pStr = alocarChar(len_max);
     char *nomes;
 
-    //cria fila
+    /* cria fila */
     fila q_fila;
     create(&q_fila);
 
-    //recebo entrada
+    /* recebo entrada */
     pStr = entraStringGrande(pStr, len_max);
-    //separo nomes
+    /* separo nomes */
     nomes = strtok(pStr, " ");
     while (nomes != NULL) {
-        //enfileira
         if(containPalindrome(nomes)){
             enqueue(&q_fila, nomes);
         }
         nomes = strtok(NULL, " ");
     }
 
-    // printf("************\n");
+    /*  printf("************\n"); */
     imprime(&q_fila);
 
     while(1){

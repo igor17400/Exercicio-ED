@@ -18,39 +18,24 @@ typedef struct{
     tipo_elem *fim;
 } fila;
 
-// cria fila vazia com dois ponteiros
+/* cria fila vazia com dois ponteiros */
 void create(fila *q) {
     q->inicio = NULL;
     q->fim = NULL;
 }
 
-// testa se q está vazia
+/* testa se q está vazia */
 boolean isEmpty (fila *q) {
     return (q->inicio == NULL);
 }
 
-// imprime q reversamente
-void printReverse(tipo_elem* head)
-{
-    // Base case
-    if (head == NULL)
-       return;
-
-    // print the list after head node
-    printReverse(head->next);
-
-    // After everything else is printed, print head
-    printf("Atividade: %s Prioridade: #%d\n", head->nome, head->pos_priority);
-}
-
-
-// imprime q
+/* imprime q */
 void imprime(fila *q) {
-    //usando um ponteiro auxiliar
+    /* usando um ponteiro auxiliar */
     tipo_elem *x;
     x = q->inicio;
 
-    //iterando na pilha
+    /* iterando na pilha */
     while(x != NULL) {
         printf("Atividade: %s Prioridade: #%d\n", x->nome, x->pos_priority);
         x = x->next;
@@ -58,7 +43,7 @@ void imprime(fila *q) {
     printf("\n");
 }
 
-// Function to push according to priority
+/* Function to push according to priority */
 void enqueuePriority(tipo_elem** head, char *nome, int p){
     tipo_elem* start = (*head);
 
@@ -100,14 +85,14 @@ boolean enqueue(fila *q_fila, char *nome, int p) {
     return TRUE;
 }
 
-// print x na posicao desejada de q
+/* print x na posicao desejada de q */
 void printPos(fila *q_fila, int pos) {
 
-    //usando um ponteiro auxiliar
+    /* usando um ponteiro auxiliar */
     tipo_elem *temp;
     temp = q_fila->inicio;
 
-    //iterando na pilha
+    /* iterando na pilha */
     for(int i = 0; i < pos && temp->next != NULL; i++) {
         temp = temp->next;
     }
@@ -115,7 +100,7 @@ void printPos(fila *q_fila, int pos) {
     printf("%s %d\n", temp->nome, temp->pos_priority);
 }
 
-// remove do topo de q
+/* remove do topo de q */
 boolean dequeue(fila *q_fila) {
 
     tipo_elem *p_elem;
@@ -213,14 +198,14 @@ int main(){
     int qtd = 0;
     int flag = 0;
 
-    //cria fila
+    /* cria fila */
     fila q_fila;
     create(&q_fila);
 
     while (1) {
-        //recebo entrada
+        /* recebo entrada */
         pStr = entraStringGrande(pStr, len_max);
-        //separo palavras
+        /* separo palavras */
         palavras = strtok(pStr, " ");
 
         if (isNumeric(palavras)){
@@ -230,7 +215,7 @@ int main(){
 
         while(palavras != NULL){
 
-            //enfileira
+            /* enfileira */
             if (!isNumeric(palavras) && palavras != NULL){
                 pStr_palavra = palavras;
                 qtd++;
@@ -260,14 +245,6 @@ int main(){
         dequeue(&q_fila);
     }
 	liberaChar(&pStr);
-    return 0;
 
-    /*
-    Tamanho da fila: 5
-    Atividade: Comer Prioridade: #1
-    Atividade: Academia Prioridade: #2
-    Atividade: Dormir Prioridade: #3
-    Atividade: ElaborarQuestoes Prioridade: #4
-    Atividade: Banhar Prioridade: #5
-    */
+    return 0;
 }
