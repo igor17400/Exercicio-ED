@@ -186,7 +186,7 @@ int containPalindrome(char *string){
                         // printf("**** 1\n");
                         flag++;
                     }
-                } else if(strlen(juncao) < strlen(teste)){
+                } else if(strlen(juncao) <= strlen(teste)){
                     // printf("2\n");
                     if( strstr(teste, juncao) == NULL ){
                         // printf("**** 2\n");
@@ -200,6 +200,9 @@ int containPalindrome(char *string){
             strcpy(teste, "");
         }
     }
+    // printf("--> flag = %d\n", flag);
+    strcpy(teste, "");
+    strcpy(juncao, "");
     free(teste);
     free(juncao);
     if(flag >= 2){
