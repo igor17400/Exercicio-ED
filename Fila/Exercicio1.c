@@ -41,7 +41,6 @@ void imprime(fila *q) {
         printf("%s\n", x->nome);
         x = x->ligado_com;
     }
-    printf("\n");
 }
 
 // insere x no fim de q
@@ -167,19 +166,43 @@ int isPalindrome(char str[]){
 int containPalindrome(char *string){
     int n = strlen(string);
     int flag = 0;
+    char *juncao = malloc(100*sizeof(char));
     char *teste = malloc(40*sizeof(char));
+    strncat(juncao, "00", 2);
     for(int i = 0; i < n; i++){
         for(int j = i; j < n; j++){
             for(int k = i; k <= j; k++){
                 strncat(teste, &string[k], 1);
             }
-            if(isPalindrome(teste) && strlen(teste) > 2)
-                flag++;
+            if(isPalindrome(teste) && (strlen(teste) > 2) ){
+                // printf("-->* %s\n", teste);
+                // printf("--> %s\n", juncao);
+                // printf("--> %s\n", strstr(juncao, teste));
+                // printf("--> juncao = %lu\n", strlen(juncao));
+                // printf("--> teste = %lu\n", strlen(teste));
+                if(strlen(juncao) > strlen(teste)){
+                    // printf("1\n");
+                    if( strstr(juncao, teste) == NULL ){
+                        // printf("**** 1\n");
+                        flag++;
+                    }
+                } else if(strlen(juncao) < strlen(teste)){
+                    // printf("2\n");
+                    if( strstr(teste, juncao) == NULL ){
+                        // printf("**** 2\n");
+                        flag++;
+                    }
+                }
+                // printf("\n");
+                strncat(juncao, teste, strlen(teste));
+                strncat(juncao, "0", 1);
+            }
             strcpy(teste, "");
         }
     }
     free(teste);
-    if(flag > 0){
+    free(juncao);
+    if(flag >= 2){
         return 1;
     } else {
         return 0;
@@ -209,6 +232,7 @@ int main(){
         nomes = strtok(NULL, " ");
     }
 
+    // printf("************\n");
     imprime(&q_fila);
 
     while(1){
