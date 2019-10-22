@@ -58,7 +58,7 @@ void enqueuePriority(tipo_elem** head, char *nome, int p){
         (*head) = temp;
     } else {
         while (start->next != NULL &&
-               start->next->pos_priority < p) {
+               start->next->pos_priority <= p) {
             start = start->next;
         }
         temp->next = start->next;
@@ -242,7 +242,12 @@ int main(){
         qtd--;
     }
 
-    printf("Tamanho da fila: %d\n", qtd);
+    if(qtd < 0){
+        printf("Tamanho da fila: %d\n", 0);
+    } else {
+        printf("Tamanho da fila: %d\n", qtd);
+    }
+
     imprime(&q_fila);
 
     while(1){

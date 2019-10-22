@@ -7,6 +7,12 @@
 #define TRUE 1
 #define FALSE 0
 
+typedef struct Node
+{
+    char str[40];
+    struct Node *prox;
+} Node;
+
 typedef struct elem {
     int info;
     char nome[20];
@@ -17,6 +23,57 @@ typedef struct{
     tipo_elem *inicio;
     tipo_elem *fim;
 } fila;
+
+void insereNoComeco(struct Node** head_ref, char *str){
+    struct Node *novo_node = (struct Node*)malloc(sizeof(Node));
+    if(novo_node == NULL){
+        printf("Error.");
+    } else{
+        // novo_node->str = str;
+        strcpy(novo_node->str, str);
+        novo_node->prox = *head_ref;
+
+        //SE LIGA
+        *head_ref = novo_node;
+    }
+}
+
+void deletaLista(struct Node** head_ref){
+   struct Node* atual = *head_ref;
+   struct Node* proximo;
+
+   while (atual != NULL)
+   {
+       proximo = atual->prox;
+       free(atual);
+       atual = proximo;
+   }
+
+   *head_ref = NULL;
+}
+
+void printList(Node *node){
+    // printf("*\n");
+    Node * temp = node;
+    while (temp != NULL)
+    {
+        printf("%s\n", temp->str);
+        temp = temp->prox;
+    }
+}
+
+char* returnList(Node *node, int size){
+    Node * temp = node;
+    int i = 0;
+    while (temp != NULL){
+        if(i == size)
+            break;
+        temp = temp->prox;
+        i++;
+    }
+    // printf("** %s\n", temp->str);
+    return temp->str;
+}
 
 void create(fila *q) {
     q->inicio = NULL;
@@ -102,7 +159,6 @@ void lerFinalFila(fila *q_fila, char *str_rtn){
     }
 }
 
-
 void liberaChar(char** lib_char){
     if(*lib_char != NULL){
         free(*lib_char);
@@ -133,8 +189,7 @@ char* entraStringGrande(char* pStr, int len_max){
     return pStr;
 }
 
-int isNumeric (const char * s)
-{
+int isNumeric (const char * s){
     if (s == NULL || *s == '\0' || isspace(*s))
       return 0;
     char * p;
@@ -155,36 +210,58 @@ int isPalindrome(char str[]){
 }
 
 int containPalindrome(char *string){
+    /* Começamos com uma lista vazia */
+    Node* head = NULL;
+
     int n = strlen(string);
     int flag = 0;
     int i, j, k = 0;
-    char juncao[100] = "";
-    char teste[40] = "";
-    strncat(juncao, "00", 3);
+    // char juncao[100] = "";
+    char *teste = malloc(40*sizeof(char));
+    char compare1[40] = "";
+    char compare2[40] = "";
+    // strncat(juncao, "_", 3);
+    int size = 0;
+
     for(i = 0; i < n; i++){
         for(j = i; j < n; j++){
             for(k = i; k <= j; k++){
                 strncat(teste, &string[k], 1);
             }
             if(isPalindrome(teste) && (strlen(teste) > 2) ){
-                if(strlen(juncao) > strlen(teste)){
-                    if( strstr(juncao, teste) == NULL ){
-                        flag++;
-                    }
-                } else if(strlen(juncao) <= strlen(teste)){
-                    if( strstr(teste, juncao) == NULL ){
-                        flag++;
-                    }
-                }
-                strncat(juncao, teste, strlen(teste));
-                strncat(juncao, "0", 1);
+                size++;
+                insereNoComeco(&head, teste);
+                // printf("-->* %s\n", teste);
+                // printList(head);
             }
             strcpy(teste, "");
         }
     }
+
+    /*verificacao de 2-palindrome*/
+    for(i = 0; i < size; i++){
+        strcpy(compare1, returnList(head, i));
+        for(j = i + 1; j < size; j++){
+            strcpy(compare2, returnList(head, j));
+            if(strlen(compare1) > strlen(compare2)){
+                if( strstr(compare1, compare2) == NULL ){
+                    flag++;
+                }
+            } else if(strlen(compare1) <= strlen(compare2)){
+                if( strstr(compare2, compare1) == NULL ){
+                    flag++;
+                }
+            }
+        }
+    }
+    // printf("****\n");
+    // printList(head);
+    // printf("****\n");
+
     strcpy(teste, "");
-    strcpy(juncao, "");
-    if(flag >= 2){
+    // strcpy(juncao, "");
+    free(teste);
+    if(flag >= 1){
         return 1;
     } else {
         return 0;
