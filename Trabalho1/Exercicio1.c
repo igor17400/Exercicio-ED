@@ -4,6 +4,9 @@
 #include <string.h>
 #include <ctype.h>
 
+// {2 ^ [3 - (4 / 8)]}
+// {2 * [3 - (4 / 8)]}
+
 int isNumeric (const char * s){
     if (s == NULL || *s == '\0' || isspace(*s))
       return 0;
@@ -121,22 +124,19 @@ enum tokens {
     TOKEN_MINUS,
     TOKEN_MULT,
     TOKEN_DIV,
+    TOKEN_POT,
     TOKEN_LEFTP,
     TOKEN_RIGHTP,
-    TOKEN_POT,
 };
 
 
 /*
- * Conversion strings from tokens.
+ * Conversão de strings em tokens
  */
-const static char token2ascii[] = "  +-*/()";
+const static char token2ascii[] = "  +-*/^()";
 const static char token2prec[]  = "  223311";
 
-/*
- * Stack and stack operations.
- */
-#define STACK_SIZE 16
+#define STACK_SIZE 17
 static enum tokens stack[STACK_SIZE];
 static int stack_ptr = 0;
 
@@ -152,7 +152,7 @@ int push(enum tokens token){
 
 enum tokens pop(void){
     if (stack_ptr == 0) {
-	return TOKEN_NONE;
+	       return TOKEN_NONE;
     }
 
     return stack[--stack_ptr];
@@ -160,7 +160,7 @@ enum tokens pop(void){
 
 enum tokens top_of_stack(void){
     if (stack_ptr == 0) {
-	return TOKEN_NONE;
+	       return TOKEN_NONE;
     }
 
     return stack[stack_ptr];
@@ -170,20 +170,21 @@ enum tokens top_of_stack(void){
  * Determine precedence of token and decide wheter to print it
  * or push it onto the stack.
  */
-void push_or_print(enum tokens token)
-{
+void push_or_print(enum tokens token){
     if (token2prec[top_of_stack()] > token2prec[token]) {
-	printf("%c ", pop());
+	       // printf("%c ", pop());
     } else {
-	push(token);
+	       push(token);
     }
 } /* push_or_print */
 
 
-void shutingYard(char* expressao){
+int shutingYard(char* expressao){
 
     /*{2 ^ [3 - (4 / 8)]}*/
     /*{2 * [3 - (4 / 8)]}*/
+
+    int flag_error = 0; /* indica se ouve erro ou nao  */
 
     int i = 0;
     int number = 0;
@@ -193,35 +194,42 @@ void shutingYard(char* expressao){
         switch(expressao[i]){
             case '+':
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
+        		// printf("%d ", number);
         		number = 0;
         	    }
         	    push_or_print(TOKEN_PLUS);
         	    break;
             case '-':
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
+        		// printf("%d ", number);
         		number = 0;
         	    }
         	    push_or_print(TOKEN_MINUS);
         	    break;
             case '*':
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
-        		number = 0;
+            		// printf("%d ", number);
+            		number = 0;
         	    }
         	    push_or_print(TOKEN_MULT);
         	    break;
             case '/':
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
+        		// printf("%d ", number);
         		number = 0;
         	    }
         	    push_or_print(TOKEN_DIV);
         	    break;
+            case '^':
+        	    if (token == TOKEN_NUMBER) {
+            		// printf("%d ", number);
+            		number = 0;
+        	    }
+        	    push_or_print(TOKEN_POT);
+        	    break;
             case '(': /* Parenthesis requires special attention */
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
+        		// printf("%d ", number);
         		number = 0;
         	    }
         	    token = TOKEN_LEFTP;
@@ -229,16 +237,17 @@ void shutingYard(char* expressao){
         	    break;
             case ')':
         	    if (token == TOKEN_NUMBER) {
-        		printf("%d ", number);
+        		// printf("%d ", number);
         		number = 0;
         	    }
         	    while ((token = pop()) != TOKEN_LEFTP) {
         		if (token == TOKEN_NONE) {
         		    fflush(stdout);
-        		    fprintf(stderr, "Parenthesis error\n");
-        		    exit(0);
+        		    // fprintf(stderr, "Parenthesis error\n");
+                    flag_error = -1;
+        		    return flag_error;
         		}
-        		printf("%c ", token2ascii[token]);
+        		      // printf("%c ", token2ascii[token]);
         	    }
         	    break;
             case '0':
@@ -255,22 +264,24 @@ void shutingYard(char* expressao){
         	    number = number * 10 + (expressao[i] - '0');
         	    break;
         	default:
-        	    fprintf(stderr, "Unknown character detected:%c[%d]\n",
-        		    number, number);
+        	    // fprintf(stderr, "Unknown character detected:%c[%d]\n",
+        		//     number, number);
+                    flag_error = -1;
         	    number = 0;
         }
     }
 
     if (token == TOKEN_NUMBER) {
-	printf("%d ", number);
+	// printf("%d ", number);
 	number = 0;
     }
 
     while ((token = pop()) != TOKEN_NONE) {
-	printf("%c ", token2ascii[token]);
+	       // printf("%c ", token2ascii[token]);
     }
 
-    printf("\n");
+    // printf("\n");
+    return flag_error;
 }
 
 /*----------------------------------------------------------------*/
@@ -301,24 +312,16 @@ _Bool numeroSimboloNumero(fila *q_fila){
 
 _Bool valida(const char* expressao) {
     /* Insira seu código aqui. */
-    int resultado_final = -1;
+    int flag_error;
+    char expressao_dois[101];
+    strcpy(expressao_dois, expressao);
 
-    char* str = malloc(sizeof(expressao)*sizeof(char));
-    strcpy(str, expressao);
-    char *simbolos;
-    int numero;
-    /* cria fila */
-    fila q_fila;
-    create(&q_fila);
-
-    // printf("------------\n");
-    // imprime(&q_fila);
-    // printf("------------\n");
-    free(str);
-
-    resultado_final = numeroSimboloNumero(&q_fila);
-
-    return resultado_final;
+    flag_error = shutingYard(expressao_dois);
+    if(flag_error == 0){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /*----------------------------------------------------------------*/
@@ -334,14 +337,13 @@ int main() {
     strcpy(expressao_dois, replaceChar(expressao, '{', '('));
     strcpy(expressao_dois, replaceChar(expressao, '}', ')'));
     remove_spaces(expressao_dois);
-    printf("%s\n", expressao_dois);
+    // printf("%s\n", expressao_dois);
 
-    shutingYard(expressao_dois);
 
-    // if (valida(expressao))
-    //     printf("VALIDA\n");
-    // else
-    //     printf("INVALIDA\n");
+    if (valida(expressao_dois))
+        printf("VALIDA\n");
+    else
+        printf("INVALIDA\n");
 
     return 0;
 }
