@@ -31,7 +31,10 @@ float fazConta(float vlr, char op, float vlr2){
     if ('/' == op)
         return vlr / vlr2;
     if('^' == op){
-        return pow(vlr, vlr2);
+        for(int i = 0; i < vlr2; i++){
+            vlr*=vlr;
+        }
+        return vlr;
     }
 
     else {
