@@ -464,7 +464,7 @@ _Bool valida(const char* expressao) {
         size++;
     }
     size += size_plus;
-    // printf("size = %d\n", size);
+
     expressao_dois[size--] = '\0';
     while(!isEmptyPilha(stack)){
         expressao_dois[size--] = pop(&stack);
