@@ -6,11 +6,6 @@
 
 #define MAX 30
 
-
-// {2 ^ [3 - (4 / 8)]}
-// {2 * [3 - (4 / 8)]}
-//8^3
-
 struct pilhaFloat{
     int topo;
     float v[MAX];
@@ -31,7 +26,8 @@ float fazConta(float vlr, char op, float vlr2){
     if ('/' == op)
         return vlr / vlr2;
     if('^' == op){
-        for(int i = 0; i < vlr2; i++){
+        int j;
+        for(j = 0; j < vlr2; j++){
             vlr*=vlr;
         }
         return vlr;
@@ -74,8 +70,12 @@ float calcula(char str[]) {
             vlr2 = pf.v[--(pf.topo)];                    /* desempilha o primeiro valor */
             vlr = pf.v[--(pf.topo)];                     /* desempilha o segundo valor */
             op = pc.v[--(pc.topo)];                      /* desempilha a operação */
-            if(op == '+' || op == '-' || op == '*' || op == '/' || op == '^')
+            if((op == '+' || op == '-' || op == '*' || op == '/' || op == '^') && isnan(vlr) == 0 && isnan(vlr2) == 0){
+                // printf("vlr = %f || op = %c || vlr2 = %f\n",vlr, op, vlr2 );
+                // printf("%d\n", isnan(vlr));
+                // printf("%d\n", isnan(vlr2));
                 pf.v[pf.topo++] = fazConta (vlr, op, vlr2); /* calcula */
+            }
             else
                 return -334;
 
@@ -142,10 +142,8 @@ _Bool checaParate(char* str){
    strcpy(expressao_dois, replaceChar(expressao_um, '{', '('));
    strcpy(expressao_dois, replaceChar(expressao_um, '}', ')'));
    remove_spaces(expressao_dois);
-   // printf("1 - %s\n", expressao_dois);
 
    if(checaParate(expressao_dois) == false){
-       // printf("3 - ola\n");
        return false;
    }
 
@@ -154,9 +152,7 @@ _Bool checaParate(char* str){
        strncat(expressao_tres, &ch1, 1);
        flag = 1;
    }
-   // printf("2 - %s\n", expressao_tres);
    strncat(expressao_tres, expressao_dois, 101);
-   // printf("3 - %s\n", expressao_tres);
 
    int size = 0;
    while(expressao_tres[size] != '\0'){
@@ -168,14 +164,13 @@ _Bool checaParate(char* str){
        strncat(expressao_tres, &ch2, 1);
    }
 
-   // printf("final -> %s\n", expressao_tres);
-   float resp = calcula (expressao_tres);
-   // printf("resp = %f\n",resp );
+   float resp = calcula(expressao_tres);
+
    if(resp != -334){
-       // printf("1 - ola\n");
+
        return true;
    } else {
-       // printf("2 - ola\n");
+
        return false;
    }
 }
