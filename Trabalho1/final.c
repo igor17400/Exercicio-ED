@@ -155,6 +155,8 @@ char dequeue(fila *q_fila) {
     return simbolo_return;
 }
 
+/*-------------------------------------------------------------------*/
+
 _Bool ehBalanceada(char *expressao){
     /* cria pilha para verificar chave e colchete */
     Pilha* stack = NULL;
@@ -201,6 +203,7 @@ _Bool ehBalanceada(char *expressao){
 
     return true;
 }
+
 
 _Bool operadoresSemNumeros(char *expressao){
 
@@ -255,6 +258,11 @@ _Bool operadoresSemNumeros(char *expressao){
             // printf("## %c\n", coringa);
             flag = 1;
         }
+    }
+
+    /* esvaziar q_fila */
+    while(!isEmpty(&q_fila)){
+        coringa = dequeue(&q_fila);
     }
 
     return true;
