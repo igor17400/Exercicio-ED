@@ -18,12 +18,12 @@ int isNumeric (const char * s){
 char* replaceChar(char* str, char ch, char Newch){
     int i;
     for(i = 0; i <= strlen(str); i++)
-  	{
-  		if(str[i] == ch)
-		{
-  			str[i] = Newch;
- 		}
-	}
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
 
     return str;
 }
@@ -61,7 +61,7 @@ _Bool isEmptyPilha(Pilha* pilha){
     if(pilha == NULL){
         saida = true;
     }
-	return saida;
+    return saida;
 }
 
 char pop(Pilha** pilha_ref){
@@ -403,30 +403,54 @@ int sizeArray(char* expressao){
     return k;
 }
 
-
-/*----------------------------------------------------------------*/
-
-_Bool valida(const char* expressao) {
-    /* Insira seu código aqui. */
-    if(sizeof(expressao) > 100)
-        return false;
-
-    char expressao_tres[101];
-    strcpy(expressao_tres, expressao);
-
-    /* ###------------ checar (){}[] ------------------### */
-    if(!ehBalanceada(expressao_tres)){
-       // printf("1 - aqui\n");
-       return false;
+char* removeChavesColchetes(char *str){
+    char ch = '[';
+    char Newch = '(';
+    int i;
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
     }
 
-    /*----------------------Coloca espaço-----------------------------*/
+    ch = ']';
+    Newch = ')';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
 
-    char expressao_dois[101];
-    strcpy(expressao_dois, replaceChar(expressao_tres, '[', '('));
-    strcpy(expressao_dois, replaceChar(expressao_tres, ']', ')'));
-    strcpy(expressao_dois, replaceChar(expressao_tres, '{', '('));
-    strcpy(expressao_dois, replaceChar(expressao_tres, '}', ')'));
+    ch = '{';
+    Newch = '(';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    ch = '}';
+    Newch = ')';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    return str;
+}
+
+char *colocaSpaces(char *expressao_dois){
+
+    expressao_dois = removeChavesColchetes(expressao_dois);
 
     int i;
     int flag = 0;
@@ -440,7 +464,7 @@ _Bool valida(const char* expressao) {
     for (i = 0; expressao_dois[i] != '\0'; i++){
 
         if(flag){
-            if(expressao[i] != ' '){
+            if(expressao_dois[i] != ' '){
                 push(&stack, ' ');
                 size_plus++;
             }
@@ -477,7 +501,29 @@ _Bool valida(const char* expressao) {
     while(!isEmptyPilha(stack)){
         expressao_dois[size--] = pop(&stack);
     }
-    /*---------------------------------------------------*/
+
+    return expressao_dois;
+}
+
+
+/*----------------------------------------------------------------*/
+
+_Bool valida(const char* expressao) {
+    /* Insira seu código aqui. */
+
+    char expressao_tres[101];
+    strcpy(expressao_tres, expressao);
+    char expressao_dois[101];
+    strcpy(expressao_dois, expressao);
+
+
+    /* ###------------ checar (){}[] ------------------### */
+    if(!ehBalanceada(expressao_tres)){
+       // printf("1 - aqui\n");
+       return false;
+    }
+
+    strcpy(expressao_dois, colocaSpaces(expressao_tres));
 
     /* ###------------ checar operadores-----------------### */
     if(!operadoresSemNumeros(expressao_tres)){
@@ -508,6 +554,9 @@ _Bool valida(const char* expressao) {
         return false;
     }
 
+
+//    free(expressao_dois);
+//    free(expressao_tres);
     return true;
 }
 
