@@ -18,12 +18,57 @@ int isNumeric (const char * s){
 char* replaceChar(char* str, char ch, char Newch){
     int i;
     for(i = 0; i <= strlen(str); i++)
-  	{
-  		if(str[i] == ch)
-		{
-  			str[i] = Newch;
- 		}
-	}
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    return str;
+}
+
+char* removeChavesColchetes(char *str){
+    char ch = '[';
+    char Newch = '(';
+    int i;
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    ch = ']';
+    Newch = ')';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    ch = '{';
+    Newch = '(';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
+
+    ch = '}';
+    Newch = ')';
+    for(i = 0; i <= strlen(str); i++)
+      {
+          if(str[i] == ch)
+        {
+              str[i] = Newch;
+         }
+    }
 
     return str;
 }
@@ -61,7 +106,7 @@ _Bool isEmptyPilha(Pilha* pilha){
     if(pilha == NULL){
         saida = true;
     }
-	return saida;
+    return saida;
 }
 
 char pop(Pilha** pilha_ref){
@@ -155,284 +200,588 @@ char dequeue(fila *q_fila) {
     return simbolo_return;
 }
 
-/*----------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 
+_Bool ehBalanceada(char *expressao){
+    /* cria pilha para verificar chave e colchete */
+    Pilha* stack = NULL;
+    char coringa;
+    int i;
+    for (i = 0; expressao[i] != '\0'; i++){
+        if(expressao[i] == '{'){
+            push(&stack, expressao[i]);
+        }
 
-
-/*------------------------- Lógica do VALIDA --------------------------*/
-
-_Bool valida(const char* expressao) {
-   /* Insira seu código aqui. */
-   char expressao_um[101];
-   char expressao_dois[101];
-   int i;
-   char coringa;
-   char char_ant;
-   // char char_ant_ant;
-   // int flag_ant_ant = 0;
-   int pos = 0;
-   int flag = 0;
-   int flag_abre = 0;
-   int flag_op = 0;
-   int flag_espaco = 0;
-
-   /* ###--------------------------------### */
-
-   /* cria pilha para verificar chave e colchete */
-   Pilha* stack = NULL;
-
-   for (i = 0; expressao[i] != '\0'; i++){
-
-       if(expressao[i] == '{'){
-           push(&stack, expressao[i]);
-       }
-
-       if(expressao[i] == '}'){
-           coringa = pop(&stack);
-           if(coringa != '{'){
-               return false;
-           }
-       }
-
-
-       if(expressao[i] == '('){
-           push(&stack, expressao[i]);
-       }
-
-       if(expressao[i] == ')'){
-           coringa = pop(&stack);
-           if(coringa != '('){
-               return false;
-           }
-       }
-
-       if(expressao[i] == '['){
-           push(&stack, expressao[i]);
-       }
-
-       if(expressao[i] == ']'){
-           coringa = pop(&stack);
-           if(coringa != '['){
-               return false;
-           }
-       }
-   }
-
-   /* ###--------------------------------### */
-   char expressao_quatro[101];
-   strcpy(expressao_um, expressao);
-   strcpy(expressao_quatro, replaceChar(expressao_um, '[', '('));
-   strcpy(expressao_quatro, replaceChar(expressao_um, ']', ')'));
-   strcpy(expressao_quatro, replaceChar(expressao_um, '{', '('));
-   strcpy(expressao_quatro, replaceChar(expressao_um, '}', ')'));
-
-   int size_again = 0;
-   for(i = 0; expressao[i] != '\0'; i++){
-       size_again++;
-   }
-   if(size_again < 2){
-       return false;
-   }
-
-
-   int flag_y;
-   for(i = 0; expressao[i] != '\0'; i++){
-       if(flag_y){
-           if(expressao[i] == '('){
-               return false;
-           }
-           flag_y = 0;
-       }
-
-       if(expressao[i] == ')'){
-           flag_y = 1;
-       }
-   }
-
-
-   /* ###--------------------------------### */
-
-   char expressao_tres[101];
-   strcpy(expressao_um, expressao);
-   strcpy(expressao_tres, replaceChar(expressao_um, '[', '('));
-   strcpy(expressao_tres, replaceChar(expressao_um, ']', ')'));
-   strcpy(expressao_tres, replaceChar(expressao_um, '{', '('));
-   strcpy(expressao_tres, replaceChar(expressao_um, '}', ')'));
-   // printf("%s\n", expressao_tres);
-
-   /* cria pilha para verificar chave e colchete */
-   Pilha* stack_operador = NULL;
-
-    /* logica do numero antes do operador */
-    for (i = 0; expressao_tres[i] != '\0'; i++){
-        if(expressao_tres[i] == '+' || expressao_tres[i] == '-' || expressao_tres[i] == '*'
-        || expressao_tres[i] == '/' || expressao_tres[i] == '^' )
-        {
-            coringa = pop(&stack_operador);
-            if(coringa == '0' || coringa == '1' || coringa == '2' ||
-                 coringa == '3' || coringa == '4' || coringa == '5' ||
-                 coringa == '6' || coringa == '7' || coringa == '8' ||
-                 coringa == '9' || coringa == ')')
-            {} else {
+        if(expressao[i] == '}'){
+            coringa = pop(&stack);
+            if(coringa != '{'){
                 return false;
             }
         }
-        if(expressao_tres[i] != ' ')
-            push(&stack_operador, expressao_tres[i]);
+
+        if(expressao[i] == '('){
+            push(&stack, expressao[i]);
+        }
+
+        if(expressao[i] == ')'){
+            coringa = pop(&stack);
+            if(coringa != '('){
+                return false;
+            }
+        }
+
+        if(expressao[i] == '['){
+            push(&stack, expressao[i]);
+        }
+
+        if(expressao[i] == ']'){
+            coringa = pop(&stack);
+            if(coringa != '['){
+                return false;
+            }
+        }
     }
 
-   /* apaga a lista inteira */
-   while(isEmptyPilha(stack_operador)){
-       coringa = pop(&stack_operador);
-   }
+    if(!isEmptyPilha(stack)){
+        return false;
+    }
 
-   remove_spaces(expressao_tres);
-   /* logica do numero depois do operador */
-   int flag_x = 0;
-  for (i = 0; expressao_tres[i] != '\0'; i++){
-      if(flag_x){
-          if(expressao_tres[i]  == '0' || expressao_tres[i]  == '1' || expressao_tres[i]  == '2' ||
-               expressao_tres[i]  == '3' || expressao_tres[i]  == '4' || expressao_tres[i]  == '5' ||
-               expressao_tres[i]  == '6' || expressao_tres[i]  == '7' || expressao_tres[i]  == '8' ||
-               expressao_tres[i]  == '9' || expressao_tres[i]  == '(')
-          {
-              flag_x = 0;
-          } else {
-              return false;
-          }
-      }
-      if(expressao_tres[i]  == '+' || expressao_tres[i]  == '-' || expressao_tres[i]  == '*'
-      || expressao_tres[i]  == '/' || expressao_tres[i]  == '^' )
-      {
-          flag_x = 1;
-      }
-  }
+    return true;
+}
 
-   /* ###--------------------------------### */
 
-   /* cria fila */
-   fila q_fila;
-   create(&q_fila);
+_Bool operadoresSemNumeros(char *expressao){
 
-   /* cria pilha para verificar chave e colchete */
-   Pilha* stack_numero = NULL;
+    /* cria fila */
+    fila q_fila;
+    create(&q_fila);
+    fila saida;
+    create(&saida);
 
-   strcpy(expressao_um, expressao);
-   strcpy(expressao_dois, replaceChar(expressao_um, '[', '('));
-   strcpy(expressao_dois, replaceChar(expressao_um, ']', ')'));
-   strcpy(expressao_dois, replaceChar(expressao_um, '{', '('));
-   strcpy(expressao_dois, replaceChar(expressao_um, '}', ')'));
+    char coringa;
+    int i;
+    int flag = 0;
 
-   for (i = 0; expressao_dois[i] != '\0'; i++){
-       enqueue(&q_fila, expressao_dois[i]);
-   }
-
-   int size = 0;
-   while(expressao_dois[size] != '\0'){
-       size++;
-   }
-
-   if(expressao_dois[size-1] == '+' || expressao_dois[size-1] == '-' || expressao_dois[size-1] == '*'
-        || expressao_dois[size-1] == '/' || expressao_dois[size-1] == '^' || expressao_dois[size-1] == '('){
-            // printf("1 ---->\n");
-            return false;
+    for (i = 0; expressao[i] != '\0'; i++){
+        if(expressao[i] == '+' || expressao[i] == '-' || expressao[i] == '*'
+        || expressao[i] == '/' || expressao[i] == '^' )
+        {
+            enqueue(&q_fila, expressao[i]);
+        } else {
+            enqueue(&saida, expressao[i]);
         }
+    }
 
-   /* logica da primeira posicao */
-   while(!isEmpty(&q_fila)){
-       coringa = dequeue(&q_fila);
-       if(pos == 0){
-           if(coringa == '+' || coringa == '-' || coringa == '*'
-           || coringa == '/' || coringa == '^' || coringa == ')'  ){
-               // printf("2 ---->\n");
-               return false;
-           }
-       }
-       pos++;
+    while(!isEmpty(&saida)){
+        coringa = dequeue(&saida);
+        // printf("%c\n", coringa);
 
-       if(flag_op){
-           if(coringa == ')' ){
-               return false;
-           }
-           flag_op = 0;
-       }
-
-       if(coringa == '+' || coringa == '-' || coringa == '*'
-            || coringa == '/' || coringa == '^' ){
-                flag_op = 1;
-        }
-
-       if(flag_abre == 1){
-           if(coringa == '+' || coringa == '-' || coringa == '*'
-                || coringa == '/' || coringa == '^' || coringa == ')' ){
-                    // printf("4 ---->\n");
+        if(flag){
+            if(flag == 2){
+                if(coringa == '0' || coringa == '1' || coringa == '2'
+                || coringa == '3' || coringa == '4' || coringa == '5'
+                || coringa == '6' || coringa == '7' || coringa == '8'
+                || coringa == '9' || coringa == '(' || coringa == ')')
+                {
                     return false;
                 }
-            flag_abre = 0;
-       }
+                flag = 0;
+            } else {
+                if(coringa == '.' || coringa == ')'){
+                    flag = 0;
+                } else{
+                    flag++;
+                }
+            }
+        }
 
-       if(coringa == '('){
-           flag++;
-           flag_abre = 1;
-       }
+        if(coringa == '0' || coringa == '1' || coringa == '2'
+        || coringa == '3' || coringa == '4' || coringa == '5'
+        || coringa == '6' || coringa == '7' || coringa == '8'
+        || coringa == '9')
+        {
+            // printf("## %c\n", coringa);
+            flag = 1;
+        }
+    }
 
-       if(coringa == ')'){
-           flag--;
-       }
+    /* esvaziar q_fila */
+    while(!isEmpty(&q_fila)){
+        coringa = dequeue(&q_fila);
+    }
+
+    return true;
+}
+
+_Bool numerosSemOperadores(char *expressao){
+
+    expressao = removeChavesColchetes(expressao);
+
+    Pilha* stack = NULL;
+    char coringa;
+
+    int flag = 0;
+    int i;
+
+    /* operadores sem numeros na frente */
+    for (i = 0; expressao[i] != '\0'; i++){
+        if(expressao[i] == '+' || expressao[i] == '-' || expressao[i] == '*'
+        || expressao[i] == '/' || expressao[i] == '^' )
+        {
+            flag = 1;
+        }
+
+        if(flag){
+            if(!(expressao[i+2] == '0' || expressao[i+2] == '1' || expressao[i+2] == '2'
+            || expressao[i+2] == '3' || expressao[i+2] == '4' || expressao[i+2] == '5'
+            || expressao[i+2] == '6' || expressao[i+2] == '7' || expressao[i+2] == '8'
+            || expressao[i+2] == '9' || expressao[i+2] == '('))
+            {
+                return false;
+            }
+            flag = 0;
+        }
+    }
+
+    /* operadores sem numeros atras */
+    for (i = 0; expressao[i] != '\0'; i++){
+        push(&stack, expressao[i]);
+
+        if(expressao[i] == '+' || expressao[i] == '-' || expressao[i] == '*'
+        || expressao[i] == '/' || expressao[i] == '^' )
+        {
+            flag = 1;
+        }
+
+        if(flag){
+            /* faz o pop tres vezes */
+            coringa = pop(&stack);
+            coringa = pop(&stack);
+            coringa = pop(&stack);
+
+            if(!(coringa == '0' || coringa == '1' || coringa == '2'
+            || coringa == '3' || coringa == '4' || coringa == '5'
+            || coringa == '6' || coringa == '7' || coringa == '8'
+            || coringa == '9' || coringa == ')'))
+            {
+                return false;
+            }
+            flag = 0;
+        }
+    }
+
+    while(!isEmptyPilha(stack)){
+        coringa = pop(&stack);
+    }
+
+    return true;
+}
+
+_Bool parentesesSemOperadores(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int flag = 0;
+    int i;
 
 
-        if(flag_espaco){
-            flag_espaco = 0;
-            char_ant = pop(&stack_numero);
-            if(coringa == '0' || coringa == '1' || coringa == '2' ||
-                 coringa == '3' || coringa == '4' || coringa == '5' ||
-                 coringa == '6' || coringa == '7' || coringa == '8' || coringa == '9'){
+    for (i = 0; expressao[i] != '\0'; i++){
 
-                    if(char_ant == '0' || char_ant == '1' || char_ant == '2' ||
-                         char_ant == '3' || char_ant == '4' || char_ant == '5' ||
-                         char_ant == '6' || char_ant == '7' || char_ant == '8' || char_ant == '9'){
-                             return false;
-                    }
+        if(flag){
+            if(!(expressao[i] == ')' || expressao[i] == ' ')){
+                return false;
+            }
+            flag = 0;
+        }
+
+        if(expressao[i] == ')'){
+            flag = 1;
+        }
+    }
+
+
+    return true;
+}
+
+_Bool parentesesVazios(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int flag = 0;
+    int i;
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+        if(flag){
+            if((expressao[i] == ')' || expressao[i] == ' ')){
+                return false;
+            }
+            flag = 0;
+        }
+
+        if(expressao[i] == '('){
+            flag = 1;
+        }
+    }
+
+
+    return true;
+
+}
+
+int sizeArray(char* expressao){
+    int k = 0;
+    while(expressao[k] != '\0'){
+        k++;
+    }
+
+    return k;
+}
+
+void removeParenteSpacesEsquerda(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int i;
+    int flag = 0;
+    int size = 0;
+    int size_minus = 0;
+
+    /* cria pilha */
+    Pilha* stack = NULL;
+
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+        if(flag){
+            if(expressao[i] == ' '){
+                continue;
+            }
+            flag = 0;
+        }
+
+        if(expressao[i] == '('){
+            flag = 1;
+        }
+        push(&stack, expressao[i]);
+
+        size++;
+    }
+
+    size -= size_minus;
+
+    expressao[size--] = '\0';
+    while(!isEmptyPilha(stack)){
+        expressao[size--] = pop(&stack);
+    }
+}
+
+void removeParenteSpacesDireita(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int i;
+    int flag = 0;
+    int size = 0;
+    int size_minus = 0;
+    char coringa;
+
+    /* cria pilha */
+    Pilha* stack = NULL;
+
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+
+        if(expressao[i] == ')'){
+            flag = 1;
+        }
+
+        if(flag){
+            coringa = pop(&stack);
+            if(coringa != ' '){
+                push(&stack, coringa);
+            }
+            flag = 0;
+        }
+
+        push(&stack, expressao[i]);
+
+        size++;
+    }
+
+    size -= size_minus;
+
+    expressao[size--] = '\0';
+    while(!isEmptyPilha(stack)){
+        expressao[size--] = pop(&stack);
+    }
+}
+
+void removeEspacosExtras(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int i;
+    int flag = 0;
+    int size = 0;
+    int size_minus = 0;
+    char coringa;
+
+    /* cria pilha */
+    Pilha* stack = NULL;
+
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+
+        if(expressao[i] == ')'){
+            flag = 1;
+        }
+
+        if(flag){
+            coringa = pop(&stack);
+            if(coringa != ' '){
+                push(&stack, coringa);
+            }
+            flag = 0;
+        }
+
+        push(&stack, expressao[i]);
+
+        size++;
+    }
+
+    size -= size_minus;
+
+    expressao[size--] = '\0';
+    while(!isEmptyPilha(stack)){
+        expressao[size--] = pop(&stack);
+    }
+}
+
+
+void colocaSpaces(char *expressao_dois){
+
+    expressao_dois = removeChavesColchetes(expressao_dois);
+
+    int i;
+    int flag = 0;
+    int size = 0;
+    int size_plus = 0;
+    char coringa;
+
+    /* cria pilha */
+    Pilha* stack = NULL;
+
+    for (i = 0; expressao_dois[i] != '\0'; i++){
+
+        if(flag){
+            if(expressao_dois[i] != ' '){
+                push(&stack, ' ');
+                size_plus++;
             }
 
+            flag = 0;
         }
 
-        if(coringa == ' '){
-            flag_espaco = 1;
+        if(expressao_dois[i] == '+' || expressao_dois[i] == '-' || expressao_dois[i] == '*'
+        || expressao_dois[i] == '/' || expressao_dois[i] == '^' )
+        {
+
+            coringa = pop(&stack);
+
+            if(coringa != ' '){
+                push(&stack, coringa);
+                push(&stack, ' ');
+                size_plus++;
+            } else {
+                push(&stack, coringa);
+            }
+
+            push(&stack, expressao_dois[i]);
+            flag = 1;
+
+        } else {
+            push(&stack, expressao_dois[i]);
         }
 
-        if(coringa == '0' || coringa == '1' || coringa == '2' ||
-             coringa == '3' || coringa == '4' || coringa == '5' ||
-             coringa == '6' || coringa == '7' || coringa == '8' || coringa == '9'){
-                 char_ant = pop(&stack_numero);
-                 push(&stack_numero, coringa);
-        }
-   }
+        size++;
+    }
+    size += size_plus;
 
-   if(flag != 0){
-       // printf("6 ---->\n");
-       return false;
-   }
-
-
-   /* ###--------------------------------### */
-
-
-
-   return true;
+    expressao_dois[size--] = '\0';
+    while(!isEmptyPilha(stack)){
+        expressao_dois[size--] = pop(&stack);
+    }
 }
+
+_Bool contagemDeNumerosOperadores(char *expressao){
+    expressao = removeChavesColchetes(expressao);
+
+    int i;
+    int op_count = 0;
+    int num_count = 0;
+    int flag = 0;
+    int flag_num = 0;
+
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+        if(expressao[i]  == '.'){
+            flag = 1;
+            continue;
+        }
+
+        if(flag){
+            if(expressao[i]  == '0' || expressao[i]  == '1' || expressao[i]  == '2'
+            || expressao[i]  == '3' || expressao[i]  == '4' || expressao[i]  == '5'
+            || expressao[i]  == '6' || expressao[i]  == '7' || expressao[i]  == '8'
+            || expressao[i]  == '9')
+            {
+                continue;
+            } else{
+                flag = 0;
+            }
+        }
+
+        if(flag_num){
+            if(expressao[i]  == '0' || expressao[i]  == '1' || expressao[i]  == '2'
+            || expressao[i]  == '3' || expressao[i]  == '4' || expressao[i]  == '5'
+            || expressao[i]  == '6' || expressao[i]  == '7' || expressao[i]  == '8'
+            || expressao[i]  == '9')
+            {
+                continue;
+            }
+            flag_num = 0;
+        }
+
+
+        if(expressao[i]  == '0' || expressao[i]  == '1' || expressao[i]  == '2'
+        || expressao[i]  == '3' || expressao[i]  == '4' || expressao[i]  == '5'
+        || expressao[i]  == '6' || expressao[i]  == '7' || expressao[i]  == '8'
+        || expressao[i]  == '9')
+        {
+            flag_num = 1;
+            num_count++;
+        }
+
+        if(expressao[i] == '+' || expressao[i] == '-' || expressao[i] == '*'
+        || expressao[i] == '/' || expressao[i] == '^' )
+        {
+            op_count++;
+        }
+    }
+
+    if(op_count != num_count-1 ){
+        return false;
+    }
+    return true;
+}
+
+_Bool verificaPontoSemNumero(char *expressao){
+    int flag = 0;
+    int i;
+
+
+    for (i = 0; expressao[i] != '\0'; i++){
+
+        if(flag){
+            if(!(expressao[i] == '0' || expressao[i] == '1' || expressao[i] == '2'
+            || expressao[i] == '3' || expressao[i] == '4' || expressao[i] == '5'
+            || expressao[i] == '6' || expressao[i] == '7' || expressao[i] == '8'
+            || expressao[i] == '9'))
+            {
+                return false;
+            }
+            flag = 0;
+        }
+
+        if(expressao[i] == '.'){
+            flag = 1;
+        }
+    }
+
+    if(flag){
+        return false;
+    }
+
+    return true;
+}
+
+
 /*----------------------------------------------------------------*/
 
+_Bool valida(const char* expressao) {
+    /* Insira seu código aqui. */
+
+    char expressao_tres[101];
+    strcpy(expressao_tres, expressao);
+    char expressao_dois[101];
+    strcpy(expressao_dois, expressao);
+
+
+    /* ###------------ checar (){}[] ------------------### */
+    if(!ehBalanceada(expressao_tres)){
+       // printf("1 - aqui\n");
+       return false;
+    }
+
+    remove_spaces(expressao_tres);
+    colocaSpaces(expressao_tres);
+    removeParenteSpacesEsquerda(expressao_tres);
+    removeParenteSpacesDireita(expressao_tres);
+    colocaSpaces(expressao_tres);
+    // printf("%s\n", expressao_tres);
+
+    /* ###------------ checar operadores-----------------### */
+    if(!operadoresSemNumeros(expressao_tres)){
+        // printf("2 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ checar operadores sem numeros-----------------### */
+    if(!numerosSemOperadores(expressao_tres)){
+        // printf("3 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ parenteses juntos -> (2)(2) -----------------### */
+    if(!parentesesSemOperadores(expressao_tres)){
+        // printf("4 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ parenteses vazios -> () -----------------### */
+    if(!parentesesVazios(expressao_tres)){
+        // printf("5 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ contagem de operadores -----------------### */
+    if(!contagemDeNumerosOperadores(expressao_tres)){
+        // printf("6 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ verificar casos como -> 1+1. -----------------### */
+    if(!verificaPontoSemNumero(expressao_tres)){
+        // printf("7 - aqui\n");
+        return false;
+    }
+
+    /* ###------------ limitar o tamanho -----------------### */
+    if(sizeArray(expressao_tres) < 4){
+        return false;
+    }
+
+    return true;
+}
 
 int main() {
-   char expressao[101];
+    char expressao[101];
 
-   scanf("%100[^\n]", expressao);
+    scanf("%100[^\n]", expressao);
 
-   if (valida(expressao))
-       printf("VALIDA\n");
-   else
-       printf("INVALIDA\n");
+    if (valida(expressao))
+        printf("VALIDA\n");
+    else
+        printf("INVALIDA\n");
 
-   return 0;
+    return 0;
 }

@@ -1,156 +1,224 @@
-/* This program converts infix expression to postfix expression.
-  * This program assume that there are Five operators: (*, /, +, -,^)
-  * This program will not work for fractional numbers.
-  * Further this program does not check whether infix expression is valid or not in terms of number of operators and operands.*/
-#include<stdio.h>
-// for exit() function
-#include<stdlib.h>
-// for isdigit(char ) function
-#include<ctype.h>
-#include<string.h>
-#define SIZE 100
+/** Matricula: 160124981
+*       Nome: IGOR LIMA ROCHA AZEVEDO
+*      Turma: E*/
 
-// Global Variable Declaration
-char stack[SIZE];
-int top = -1;
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-//Global Function Declaration
-void push(char c);
-char pop();
-int isoperator(char symbol);
-int precedence(char symbol);
-void InfixToPostfix(char infix_exp[], char postfix_exp[]);
 
-// main() function begins
-void main()
-{
-// Declare infix string and postfix string
-char infix[SIZE], postfix[SIZE];
-printf("\n\n Enter Infix expression : ");
-gets(infix);
-// Call to convert
-InfixToPostfix(infix,postfix);
-printf("\n Postfix Expression: ");
-// Print postfix expression
-puts(postfix);
+/*------------------------- Lógica da PILHA -------------------------*/
+
+typedef struct Pilha {
+    char nome;
+    struct Pilha* prox;
+} Pilha;
+
+void push(struct Pilha** pilha_ref, char nome){
+    Pilha *novo_node = (Pilha*) malloc(sizeof(Pilha));
+    if(!novo_node){
+        printf("Error.");
+    } else{
+        novo_node->nome = nome;
+        novo_node->prox = *pilha_ref;
+
+        *pilha_ref = novo_node;
+    }
 }
 
-void InfixToPostfix(char infix_exp[], char postfix_exp[])
-{
-int i, j;
-char item, x;
-// push ' ( ' onto stack
-push('(');
-// add ' ) ' to infix expression
-strcat(infix_exp,")");
-i=0;
-j=0;
-// Initialize before loop
-item=infix_exp[i];
-// Run loop till end of infix expression
-while(item != '\0')
-{
-if(item == '(')
-{
-push(item);
-}
-else if( isdigit(item) || isalpha(item))
-{
-// Add operand symbol to postfix expr
-postfix_exp[j] = item;
-j++;
-}
-else if(isoperator(item) == 1)
-{
-// pop all higher precendence operator and add them to postfix expresion
-x=pop();
-while(isoperator(x) == 1 && precedence(x)>= precedence(item))
-{
-postfix_exp[j] = x;
-j++;
-x = pop();
-}
-// push the last pop oprerator symbol onto stack
-push(x);
-// push current oprerator symbol onto stack
-push(item);
-}
-// if current symbol is ')' then pop and keep popping until '(' encounterd
-else if(item == ')')
-{
-x = pop();
-while(x != '(')
-{
-postfix_exp[j] = x;
-j++;
-x = pop();
-}
-}
-else
-{
-// if current symbol is neither operand not '(' nor ')' and nor operator
-printf("\nInvalid infix Expression.\n");
-break;
-}
-i++;
-// Go to next symbol of infix expression */
-item = infix_exp[i];
-} // End while loop
-if(top > 0)
-printf("\n Invalid infix Expression.");
-postfix_exp[j] = '\0';
+_Bool isEmptyPilha(Pilha* pilha){
+    /*
+     está vazia -> true
+     não está vazia -> false
+     */
+    bool saida = false;
+    if(pilha == NULL){
+        saida = true;
+    }
+    return saida;
 }
 
-// Define push operation
-void push(char c)
-{
-if(top >= SIZE-1)
-printf("\n Stack Overflow.");
-else
-{
-top++;
-stack[top] = c;
-}
+char pop(Pilha** pilha_ref){
+    char saida = '\0';
+    struct Pilha *prox_pilha = NULL;
+
+    if(*pilha_ref == NULL) {
+        return saida;
+    }
+
+    prox_pilha = (*pilha_ref)->prox;
+    saida = (*pilha_ref)->nome;
+    free(*pilha_ref);
+    *pilha_ref = prox_pilha;
+
+    return saida;
 }
 
-// Define pop operation
-char pop()
-{
-char c;
-c='\0';
-if(top < 0)
-printf("\n Stack Underflow.");
-else
-{
-c = stack[top];
-top--;
-}
-return c;
+char topo(Pilha** pilha_ref){
+    char saida = '\0';
+    saida = pop(pilha_ref);
+    push(pilha_ref, saida);
+
+    return saida;
 }
 
-// Define function that is used to determine whether any symbol is operator or not
-int isoperator(char symbol)
-{
-if(symbol == '^' || symbol == '*' || symbol == '/' || symbol == '+' || symbol == '-')
-return 1;
-else
-return 0;
+/*-------------------------------------------------------------------*/
+
+int priority(char ch) {
+    if(ch == '(')
+        return 0;
+    if(ch == '+' || ch == '-')
+        return 1;
+    if(ch == '*' || ch == '/')
+        return 2;
+    if(ch == '^')
+        return 3;
+    return 0;
 }
 
-// Define fucntion that is used to assign precendence to operator.
-// In this fucntion we assume that higher integer value means higher precendence
-int precedence(char symbol)
-{
-if(symbol == '^')
-return(5);
-else if(symbol == '/')
-return(4);
-else if(symbol == '*')
-return(3);
-else if(symbol == '+')
-return(2);
-else if(symbol == '-')
-return(1);
-else
-return(0);
+_Bool isNumeric(char coringa){
+    if(coringa == '0' || coringa == '1' || coringa == '2'
+    || coringa == '3' || coringa == '4' || coringa == '5'
+    || coringa == '6' || coringa == '7' || coringa == '8'
+    || coringa == '9')
+    {
+        return true;
+    }
+    return false;
 }
+
+void remove_spaces(char* str) {
+    const char* new_str = str;
+    do {
+        while (*new_str == ' ') {
+            ++new_str;
+        }
+    } while ( (*str++ = *new_str++) );
+}
+
+int sizeFunction(char* str){
+    int i;
+    int size = 0;
+
+    for(i = 0; str[i] != '\0'; i++){
+        size++;
+    }
+    size++;
+
+    return size;
+}
+
+void insert_spaces(char *str){
+    //Insert Space between each character
+    int i, j = 0;
+
+    int size = sizeFunction(str);
+
+    char old_str[101];
+    strcpy(old_str, str);
+
+    for(i = 0; i < size; i++){
+        str[j] = old_str[i];
+        j++;
+
+        if(old_str[i] == '.')
+            continue;
+
+        if(old_str[i+1] == '.')
+            continue;
+
+        if(isNumeric(old_str[i+1]))
+            continue;
+
+        if(old_str[i] == ' ')
+            continue;
+
+        if(old_str[i+1] == ' ')
+            continue;
+
+        str[j] = ' ';
+        j++;
+    }
+}
+
+void transforma(const char* infixa, char* posfixa) {
+    /* Insira seu código aqui. */
+    int i;
+    char coringa, coringa_dois;
+    int flag = 0;
+    char temp[101];
+    /* cria pilha */
+    Pilha* stack = NULL;
+
+    strcpy(temp, infixa);
+    strcpy(posfixa, "");
+    remove_spaces(temp);
+
+
+    for(i = 0; temp[i] != '\0'; i++){
+        if(isNumeric(temp[i]) || temp[i] == '.'){
+            if(flag && temp[i] != '.'){
+                char ch = ' ';
+                strncat(posfixa, &ch, 1);
+                strncat(posfixa, &temp[i], 1);
+                flag = 0;
+            } else {
+                strncat(posfixa, &temp[i], 1);
+            }
+//            printf("%c\n", temp[i]);
+        } else if(temp[i] == '('){
+            push(&stack, temp[i]);
+        } else if(temp[i] == ')'){
+            coringa = pop(&stack);
+            while(coringa != '('){
+                strncat(posfixa, &coringa, 1);
+//                printf("%c\n", coringa);
+                coringa = pop(&stack);
+            }
+        } else {
+            flag = 1;
+            if(!isEmptyPilha(stack))
+                while(priority(topo(&stack)) >= priority(temp[i])){
+                    coringa_dois = pop(&stack);
+                    strncat(posfixa, &coringa_dois, 1);
+//                    printf("%c\n",pop(&stack));
+                }
+            push(&stack, temp[i]);
+        }
+    }
+
+    push(&stack, '\0');
+
+    while(!isEmptyPilha(stack)){
+        coringa_dois = pop(&stack);
+        strncat(posfixa, &coringa_dois, 1);
+//        printf("%c\n",pop(&stack));
+    }
+//    printf("\n");
+
+    insert_spaces(posfixa);
+
+}
+
+int main() {
+    char infixa[101], posfixa[201];
+
+    scanf("%100[^\n]", infixa);
+
+    transforma(infixa, posfixa);
+    printf("%s\n", posfixa);
+
+    return 0;
+}
+
+/*
+
+Input                                          Result
+-------------------------------------------------------------------------------
+1 + 2 * 3                                      1 2 3 * +
+(1 + 2) * 3                                    1 2 + 3 *
+(3.14 * 2.5) + 7 - (0.25 / 1 + 42)             3.14 2.5 * 7 + 0.25 1 / 42 + -
+1 ^ 3 * 5 + 4 / 2                              1 3 ^ 5 * 4 2 / +
+
+*/
