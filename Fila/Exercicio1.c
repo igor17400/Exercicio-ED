@@ -13,7 +13,7 @@ typedef struct Node
     struct Node *prox;
 } Node;
 
-typedef struct elem {
+typedef struct {
     int info;
     char nome[20];
     struct elem *ligado_com;

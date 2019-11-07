@@ -1,15 +1,17 @@
+/** Matricula: 160124981
+*       Nome: IGOR LIMA ROCHA AZEVEDO
+*      Turma: E*/
+
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
-#define boolean int
-#define TRUE 1
-#define FALSE 0
+/*------------------------- Lógica da FILA -------------------------*/
 
 typedef struct elem {
     int info;
-    char nome[20];
+    char nome;
     struct elem *ligado_com;
 } tipo_elem;
 
@@ -18,40 +20,34 @@ typedef struct{
     tipo_elem *fim;
 } fila;
 
-// cria fila vazia com dois ponteiros
 void create(fila *q) {
     q->inicio = NULL;
     q->fim = NULL;
 }
 
-// testa se q está vazia
-boolean isEmpty (fila *q) {
+_Bool isEmpty (fila *q) {
     return (q->inicio == NULL);
 }
 
-// imprime q
 void imprime(fila *q) {
 
-    //usando um ponteiro auxiliar
     tipo_elem *x;
     x = q->inicio;
 
-    //iterando na pilha
     while(x != NULL) {
-        printf("%s\n", x->nome);
+        printf("%c\n", x->nome);
         x = x->ligado_com;
     }
-    printf("\n");
 }
 
-// insere x no fim de q
-boolean enqueue(fila *q_fila, char *nome) {
+_Bool enqueue(fila *q_fila, char nome) {
 
     tipo_elem *novo_elemento = malloc(sizeof(tipo_elem));
     if(novo_elemento == NULL)
-        return FALSE;
+        return false;
 
-    strcpy(novo_elemento->nome, nome);
+    // strcpy(novo_elemento->nome, nome);
+    novo_elemento->nome = nome;
     novo_elemento->ligado_com = NULL;
 
     if(isEmpty(q_fila)) {
@@ -61,15 +57,15 @@ boolean enqueue(fila *q_fila, char *nome) {
     }
 
     q_fila->fim = novo_elemento;
-    return TRUE;
+    return true;
 }
 
-// remove do topo de q
-boolean dequeue(fila *q_fila) {
+char dequeue(fila *q_fila) {
 
+    char simbolo_return = '\0';
     tipo_elem *p_elem;
     if (isEmpty(q_fila)) {
-        return FALSE;
+        return simbolo_return;
     }
 
     p_elem = q_fila->inicio;
@@ -78,9 +74,148 @@ boolean dequeue(fila *q_fila) {
     if(q_fila->inicio == NULL) {
         q_fila->fim = NULL;
     }
+    simbolo_return = p_elem->nome;
 
     free(p_elem);
-    return TRUE;
+    return simbolo_return;
+}
+
+/*-------------------------------------------------------------------*/
+
+
+
+/*------------------------- Lógica da PILHA -------------------------*/
+
+typedef struct Pilha {
+    char nome;
+    struct Pilha* prox;
+} Pilha;
+
+void push(struct Pilha** pilha_ref, char nome){
+    Pilha *novo_node = (Pilha*) malloc(sizeof(Pilha));
+    if(!novo_node){
+        printf("Error.");
+    } else{
+        novo_node->nome = nome;
+        novo_node->prox = *pilha_ref;
+
+        *pilha_ref = novo_node;
+    }
+}
+
+_Bool isEmptyPilha(Pilha* pilha){
+    /*
+     está vazia -> true
+     não está vazia -> false
+     */
+    bool saida = false;
+    if(pilha == NULL){
+        saida = true;
+    }
+    return saida;
+}
+
+char pop(Pilha** pilha_ref){
+    char saida = '\0';
+    struct Pilha *prox_pilha = NULL;
+
+    if(*pilha_ref == NULL) {
+        return saida;
+    }
+
+    prox_pilha = (*pilha_ref)->prox;
+    saida = (*pilha_ref)->nome;
+    free(*pilha_ref);
+    *pilha_ref = prox_pilha;
+
+    return saida;
+}
+
+char topo(Pilha** pilha_ref){
+    char saida = '\0';
+    saida = pop(pilha_ref);
+    push(pilha_ref, saida);
+
+    return saida;
+}
+
+/*-------------------------------------------------------------------*/
+
+int priority(char ch) {
+    if(ch == '(')
+        return 0;
+    if(ch == '+' || ch == '-')
+        return 1;
+    if(ch == '*' || ch == '/')
+        return 2;
+    if(ch == '^')
+        return 3;
+    return 0;
+}
+
+_Bool isNumeric(char coringa){
+    if(coringa == '0' || coringa == '1' || coringa == '2'
+    || coringa == '3' || coringa == '4' || coringa == '5'
+    || coringa == '6' || coringa == '7' || coringa == '8'
+    || coringa == '9')
+    {
+        return true;
+    }
+    return false;
+}
+
+
+void remove_spaces(char* str) {
+    char* new_str = str;
+    do {
+        while (*new_str == ' ') {
+            ++new_str;
+        }
+    } while ( (*str++ = *new_str++) );
+}
+
+int sizeFunction(char* str){
+    int i;
+    int size = 0;
+
+    for(i = 0; str[i] != '\0'; i++){
+        size++;
+    }
+    size++;
+
+    return size;
+}
+
+void insert_spaces(char *str){
+    int i, j = 0;
+
+    int size = sizeFunction(str);
+
+    char old_str[101] = "";
+    strcpy(old_str, str);
+
+    for(i = 0; i < size; i++){
+        str[j] = old_str[i];
+        j++;
+
+        if(old_str[i] == '.')
+            continue;
+
+        if(old_str[i+1] == '.')
+            continue;
+
+        if(isNumeric(old_str[i+1]))
+            continue;
+
+        if(old_str[i] == ' ')
+            continue;
+
+        if(old_str[i+1] == ' ')
+            continue;
+
+        str[j] = ' ';
+        j++;
+    }
 }
 
 char* alocarChar(int size){
@@ -92,25 +227,6 @@ char* alocarChar(int size){
     return aloc_char;
 }
 
-void lerTopoFila(fila *q_fila, char *str_rtn){
-    if(isEmpty(q_fila)) {
-        printf("Fila vazia\n");
-        return;
-    } else {
-        strcpy(str_rtn, q_fila->inicio->nome);
-    }
-}
-
-void lerFinalFila(fila *q_fila, char *str_rtn){
-    if(isEmpty(q_fila)) {
-        printf("Fila vazia\n");
-        return;
-    } else {
-        strcpy(str_rtn, q_fila->fim->nome);
-    }
-}
-
-
 void liberaChar(char** lib_char){
     if(*lib_char != NULL){
         free(*lib_char);
@@ -118,89 +234,94 @@ void liberaChar(char** lib_char){
     }
 }
 
-char* entraStringGrande(char* pStr, int len_max){
-    unsigned int current_size = 0;
+void transforma(const char* infixa, char* posfixa) {
+    /* Insira seu código aqui. */
+    int i = 0;
+    char coringa = '\0', coringa_dois = '\0';
+    int flag = 0;
 
-    /*Espera o usuario entrar com a string que vamos analisar*/
-    if(pStr != NULL){
-    	int c = EOF;
-    	unsigned int i =0;
+    /* cria pilha */
+    Pilha* stack = NULL;
 
-    	while (( c = getchar() ) != '\n' && c != EOF)
-    	{
-    		pStr[i++]=(char)c;
-
-            /* caso tenhamos chegado no máximo precisamos utilizar o realloc*/
-    		if(i == current_size){
-                current_size = i+len_max;
-    			pStr = realloc(pStr, current_size);
-    		}
-	    }
-
-    	pStr[i] = '\0';
-    }
-
-    return pStr;
-}
-
-int isNumeric (const char * s)
-{
-    if (s == NULL || *s == '\0' || isspace(*s))
-      return 0;
-    char * p;
-    strtod (s, &p);
-    return *p == '\0';
-}
-
-int main(){
-
-    unsigned int len_max = 128;
-
-    char *pStr = alocarChar(len_max);
-    char *nomes;
-    char *nome_topo = alocarChar(20);
-    char *nome_topo_print = alocarChar(20);
-    char *nome_final_print = alocarChar(20);
-    int numero = 0;
-    int i;
-
-    //cria fila
+        /* cria fila */
     fila q_fila;
     create(&q_fila);
 
-    //recebo entrada
-    pStr = entraStringGrande(pStr, len_max);
-    //separo nomes
-    nomes = strtok(pStr, " ");
-    while (nomes != NULL) {
-        if (isNumeric(nomes)){
-            numero = atoi(nomes);
-            break;
+    for(i = 0; infixa[i] != '\0'; i++){
+        if(infixa[i] == ' '){
+            continue;
         }
-        //enfileira
-        enqueue(&q_fila, nomes);
-        nomes = strtok(NULL, " ");
+
+        if(isNumeric(infixa[i]) || infixa[i] == '.' || isalpha(infixa[i]) != 0){
+            if(flag && infixa[i] != '.'){
+                enqueue(&q_fila, ' ');
+                enqueue(&q_fila, infixa[i]);
+                flag = 0;
+            } else {
+                enqueue(&q_fila, infixa[i]);
+            }
+
+        } else if(infixa[i] == '('){
+            push(&stack, infixa[i]);
+        } else if(infixa[i] == ')'){
+            coringa = pop(&stack);
+            while(coringa != '('){
+                enqueue(&q_fila, ' ');
+                enqueue(&q_fila, coringa);
+                coringa = pop(&stack);
+            }
+        } else {
+            flag = 1;
+            if(!isEmptyPilha(stack))
+                while(priority(topo(&stack)) >= priority(infixa[i])){
+                    coringa_dois = pop(&stack);
+                    enqueue(&q_fila, ' ');
+                    enqueue(&q_fila, coringa_dois);
+                }
+            push(&stack, infixa[i]);
+        }
     }
 
-    for(i = 0; i < numero; i++){
-        lerTopoFila(&q_fila, nome_topo);
-        dequeue(&q_fila);
-        enqueue(&q_fila, nome_topo);
+    while(!isEmptyPilha(stack)){
+        coringa_dois = pop(&stack);
+        enqueue(&q_fila, ' ');
+        enqueue(&q_fila, coringa_dois);
     }
 
-    lerTopoFila(&q_fila, nome_topo_print);
-    lerFinalFila(&q_fila, nome_final_print);
-
-    printf("Pessoa da frente: %s\n", nome_topo_print);
-    printf("Pessoa do fim: %s\n", nome_final_print);
-
-    for(i = 0; i < numero; i++){
-
-        dequeue(&q_fila);
+    /* esvaziar q_fila */
+    int k = 0;
+    while(!isEmpty(&q_fila)){
+        posfixa[k] = dequeue(&q_fila);
+        k++;
     }
-	liberaChar(&pStr);
-    liberaChar(&nome_topo);
-    liberaChar(&nome_topo_print);
-    liberaChar(&nome_final_print);
+
+
+    while(posfixa[k] != '\0'){
+        posfixa[k] = '\0';
+        k++;
+    }
+
+}
+
+int main() {
+    char infixa[101], posfixa[101] = "";
+
+    scanf("%100[^\n]", infixa);
+
+    transforma(infixa, posfixa);
+    printf("%s\n", posfixa);
+
     return 0;
 }
+
+/*
+
+Input                                          Result
+-------------------------------------------------------------------------------
+1 + 2 * 3                                      1 2 3 * +
+(1 + 2) * 3                                    1 2 + 3 *
+(3.14 * 2.5) + 7 - (0.25 / 1 + 42)             3.14 2.5 * 7 + 0.25 1 / 42 + -
+1 ^ 3 * 5 + 4 / 2                              1 3 ^ 5 * 4 2 / +
+(A * B) + C - (D / E + F)                      A B * C + D E / F + -
+
+*/

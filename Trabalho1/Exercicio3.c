@@ -51,7 +51,6 @@ double pop(Pilha** pilha_ref){
 
     prox_pilha = (*pilha_ref)->prox;
     saida = (*pilha_ref)->num;
-    printf("--> %f\n", saida);
     free(*pilha_ref);
     *pilha_ref = prox_pilha;
 
@@ -79,6 +78,64 @@ _Bool isNumeric(char coringa){
     return false;
 }
 
+// reverses a string 'str' of length 'len'
+void reverse(char *str, int len){
+    int i=0, j=len-1, temp;
+    while (i<j)
+    {
+        temp = str[i];
+        str[i] = str[j];
+        str[j] = temp;
+        i++; j--;
+    }
+}
+
+ // Converts a given integer x to string str[].  d is the number
+ // of digits required in output. If d is more than the number
+ // of digits in x, then 0s are added at the beginning.
+int intToStr(int x, char str[], int d){
+    int i = 0;
+    while (x)
+    {
+        str[i++] = (x%10) + '0';
+        x = x/10;
+    }
+
+    // If number of digits required is more, then
+    // add 0s at the beginning
+    while (i < d)
+        str[i++] = '0';
+
+    reverse(str, i);
+    str[i] = '\0';
+    return i;
+}
+
+// Converts a floating point number to string.
+void ftoa(float n, char *res, int afterpoint){
+    // Extract integer part
+    int ipart = (int)n;
+
+    // Extract floating part
+    float fpart = n - (float)ipart;
+
+    // convert integer part to string
+    int i = intToStr(ipart, res, 0);
+
+    // check for display option after point
+    if (afterpoint != 0)
+    {
+        res[i] = '.';  // add dot
+
+        // Get the value of fraction part upto given no.
+        // of points after dot. The third parameter is needed
+        // to handle cases like 233.007
+        fpart = fpart * pow(10, afterpoint);
+
+        intToStr((int)fpart, res + i + 1, afterpoint);
+    }
+}
+
 double calcula(const char* posfixa) {
     /* Insira seu código aqui. */
 
@@ -89,7 +146,6 @@ double calcula(const char* posfixa) {
     double num1 = 0.0;
     double num2 = 0.0;
 
-    char coringa = '\0';
     char num[101] = "";
     double num_double = 0.0;
 
@@ -97,9 +153,9 @@ double calcula(const char* posfixa) {
     Pilha* stack = NULL;
 
     for(i = 0; posfixa[i] != '\0'; i++){
-
-        if(posfixa[i] == '.')
+        if(posfixa[i] == '.'){
             continue;
+        }
 
         if(isNumeric(posfixa[i])){
 
@@ -111,18 +167,23 @@ double calcula(const char* posfixa) {
 
             if(flag_float){
                 strcat(num, &posfixa[i]);
+                continue;
             }
 
             if(isNumeric(posfixa[i+1])){
-                strcat(num, &posfixa[i]);
+                strncat(num, &posfixa[i], 1);
                 flag_num_duas_casas = 1;
                 continue;
             }
 
+            if(flag_num_duas_casas){
+                strncat(num, &posfixa[i], 1);
+                continue;
+            }
+
             num_double = atof(&posfixa[i]);
-            printf("%f\n", num_double);
             push(&stack, num_double);
-        } else {
+        } else if(posfixa[i] != ' '){
             num1 = pop(&stack);
             num2 = pop(&stack);
             switch (posfixa[i])
@@ -134,7 +195,6 @@ double calcula(const char* posfixa) {
                         push(&stack, num2 - num1);
                         break;
                 case '*':
-                        printf("2) %f 1) %f\n", num2, num1);
                         push(&stack, num2 * num1);
                         break;
                 case '/':
@@ -146,7 +206,7 @@ double calcula(const char* posfixa) {
             }
         }
 
-        if(posfixa[i+1] == ' '){
+        if(posfixa[i] == ' '){
 
              if(flag_float){
                  num_double = atof(num);
